@@ -55,6 +55,18 @@ local function EditContainer(inst)
     self:WidgetSetup("icebox")
 end
 
+local function TryPerish(item)
+    item.components.perishable:ReducePercent(.07)
+end
+
+local function DoPerish(inst)
+    for k,v in pairs(inst.components.container.slots) do
+        if v.components.perishable then
+            TryPerish(v)
+        end
+    end
+end
+
 local function fn(Sim)
     local inst = CreateEntity()
 
@@ -99,52 +111,11 @@ local function fn(Sim)
     inst.components.workable:SetOnFinishCallback(onhammered)
     inst.components.workable:SetOnWorkCallback(onhit) 
         
-    inst:ListenForEvent( "onbuilt", onbuilt)
+    inst:ListenForEvent("onbuilt", onbuilt)
     MakeSnowCovered(inst, .01)  
 
-    inst:DoPeriodicTask(60, function(inst)
-        local con_inst = inst.components.container
-        local num_found = 0
-        local num_egg = 0
-        --calculate foods except spoiled foods, rotten eggs and eggs
-        for k,v in pairs(inst.components.container.slots) do
-            if v.prefab ~= "spoiled_food" and v.prefab ~= "rottenegg" and v.prefab ~= "bird_egg" then
-                if v.components.stackable then
-                    num_found = num_found + v.components.stackable:StackSize()
-                else
-                    num_found = num_found + 1
-                end
-            end
-        end
-        --calculate egg
-        for k,v in pairs(inst.components.container.slots) do
-            if v.prefab == "bird_egg" then
-                num_egg = num_egg + v.components.stackable:StackSize()
-            end
-        end
-        --turn foods into spoiled foods
-        if num_found > 0 then
-            for k,v in pairs(inst.components.container.slots) do
-                if v.prefab ~= "spoiled_food" and v.prefab ~= "rottenegg" and v.prefab ~= "bird_egg" then
-                    if v.components.stackable then
-                        con_inst:ConsumeByName(v.prefab, v.components.stackable:StackSize())
-                    else
-                        con_inst:ConsumeByName(v.prefab, 1)
-                    end
-                end
-            end
-            for i = 1, num_found do con_inst:GiveItem(SpawnPrefab("spoiled_food")) end
-        end
-        --turn eggs into rotten eggs
-        if num_egg > 0 then
-            for k,v in pairs(inst.components.container.slots) do
-                if v.prefab == "bird_egg" then
-                    con_inst:ConsumeByName(v.prefab, v.components.stackable:StackSize())
-                end
-            end
-            for i = 1, num_egg do con_inst:GiveItem(SpawnPrefab("rottenegg")) end
-        end
-    end)
+    --Rot Function
+    inst:DoPeriodicTask(1, DoPerish, .5)
 
     return inst
 end

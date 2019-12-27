@@ -3,7 +3,7 @@ description = "Foods in the Machine will spoil soon, which supply plenty of spoi
 
 author = "辣椒小皇纸"
 
-version = "1.1"
+version = "1.2.0"
 
 api_version = 10
 api_version_dst = 10
