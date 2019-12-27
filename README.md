@@ -4,7 +4,7 @@
 
 This is a mod for the game of Don't Starve Together which is available in the Steam Workshop. 
 
-Foods in the Machine will spoil soon, which supply plenty of spoiled food to fertilize and rotten eggs to make gun powder.
+Foods in the Rot Machine will spoil soon, which supply plenty of spoiled food to fertilize and rotten eggs to make gun powder.
 
 ## Changelog
 
